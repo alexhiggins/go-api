@@ -35,7 +35,7 @@ func (s *server) GetAuthorHandler(c *gin.Context) {
 }
 
 func (s *server) CreateAuthorHandler(c *gin.Context) {
-	v, a := validation.Validate(c.Request)
+	v, a := validation.NewAuthor(c.Request)
 	if len(v) > 0 {
 		s.statusUnprocessable(c, v)
 		return

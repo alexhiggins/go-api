@@ -6,13 +6,13 @@ import (
 	"net/url"
 )
 
-type CreateAuthorRequest struct {
+type ValidatedAuthor struct {
 	Name string `json:"name"`
 	Bio  string `json:"bio"`
 }
 
-func Validate(r *http.Request) (url.Values, CreateAuthorRequest) {
-	var a CreateAuthorRequest
+func NewAuthor(r *http.Request) (url.Values, ValidatedAuthor) {
+	var a ValidatedAuthor
 	rules := govalidator.MapData{
 		"name": []string{"required", "between:3,10"},
 		"bio":  []string{"required", "min:50", "max:200"},
