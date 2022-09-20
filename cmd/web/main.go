@@ -34,17 +34,18 @@ func main() {
 	router.Use(cors.Default())
 
 	logger, _ := zap.NewProduction()
+	authorRepository := repository.NewDbAuthorRepository(db)
 
 	server := &server{
 		config: cfg,
 		logger: logger,
 		router: router,
 		commands: commands{
-			createAuthor: command.NewCreateAuthorCommand(repository.NewAuthorRepository(db)),
+			createAuthor: command.NewCreateAuthorCommand(authorRepository),
 		},
 		queries: queries{
-			fetchAuthor:     query.NewFetchAuthorQuery(repository.NewAuthorRepository(db)),
-			fetchAllAuthors: query.NewFetchAllAuthorsQuery(repository.NewAuthorRepository(db)),
+			fetchAuthor:     query.NewFetchAuthorQuery(authorRepository),
+			fetchAllAuthors: query.NewFetchAllAuthorsQuery(authorRepository),
 		},
 	}
 

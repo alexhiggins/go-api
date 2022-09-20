@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/alexhiggins/go-api/internal/data"
 )
 
@@ -28,6 +29,40 @@ func (d *AuthorDbRepository) Create(ctx context.Context, params data.CreateAutho
 	return d.query.CreateAuthor(ctx, params)
 }
 
-func NewAuthorRepository(db *sql.DB) *AuthorDbRepository {
+type AuthorInMemoryRepository struct {
+	authors []data.Author
+}
+
+func (d *AuthorInMemoryRepository) All(ctx context.Context) ([]data.Author, error) {
+	return d.authors, nil
+}
+
+func (d *AuthorInMemoryRepository) WhereId(ctx context.Context, id int64) (data.Author, error) {
+	for _, a := range d.authors {
+		if a.ID == id {
+			return a, nil
+		}
+	}
+
+	return data.Author{}, errors.New("unable to find author")
+}
+
+func (d *AuthorInMemoryRepository) Create(ctx context.Context, params data.CreateAuthorParams) (data.Author, error) {
+	author := data.Author{
+		ID:   int64(len(d.authors) + 1),
+		Name: params.Name,
+		Bio:  params.Bio,
+	}
+
+	d.authors = append(d.authors, author)
+
+	return author, nil
+}
+
+func NewDbAuthorRepository(db *sql.DB) *AuthorDbRepository {
 	return &AuthorDbRepository{query: data.New(db)}
+}
+
+func NewInMemoryAuthorRepository() *AuthorInMemoryRepository {
+	return &AuthorInMemoryRepository{}
 }
