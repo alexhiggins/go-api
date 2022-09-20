@@ -3,13 +3,13 @@ package main
 import (
 	"database/sql"
 	"flag"
-	"fmt"
-	"github.com/alexhiggins/go-api/internal/author"
+	"github.com/alexhiggins/go-api/internal/command"
+	"github.com/alexhiggins/go-api/internal/query"
+	"github.com/alexhiggins/go-api/internal/repository"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
-	"os"
 )
 
 type config struct {
@@ -25,35 +25,30 @@ func main() {
 	flag.StringVar(&cfg.db.dsn, "dsn", "postgres-dsn", "PostgresSQL DSN")
 	flag.Parse()
 
+	db, err := sql.Open("postgres", cfg.db.dsn)
+	if err != nil {
+		panic(err)
+	}
+
 	router := gin.Default()
 	router.Use(cors.Default())
 
 	logger, _ := zap.NewProduction()
 
-	db, err := sql.Open("postgres", cfg.db.dsn)
-	if err != nil {
-		_ = fmt.Errorf("unable to connect to database: %v", err)
-		os.Exit(1)
-	}
-
-	defer func() {
-		_ = db.Close()
-	}()
-
 	server := &server{
+		config: cfg,
 		logger: logger,
 		router: router,
 		commands: commands{
-			createAuthor: author.NewCreateAuthorCommand(author.NewDbRepository(db)),
+			createAuthor: command.NewCreateAuthorCommand(repository.NewAuthorRepository(db)),
 		},
 		queries: queries{
-			fetchAuthor:     author.NewFetchAuthorQuery(author.NewDbRepository(db)),
-			fetchAllAuthors: author.NewFetchAllAuthorsQuery(author.NewDbRepository(db)),
+			fetchAuthor:     query.NewFetchAuthorQuery(repository.NewAuthorRepository(db)),
+			fetchAllAuthors: query.NewFetchAllAuthorsQuery(repository.NewAuthorRepository(db)),
 		},
 	}
 
 	if err := server.run(cfg.port); err != nil {
-		_ = fmt.Errorf("error starting up: %s", err)
-		os.Exit(1)
+		panic(err)
 	}
 }

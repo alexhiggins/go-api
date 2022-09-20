@@ -11,7 +11,7 @@ func (s *server) routes() *gin.Engine {
 	{
 		v1.GET("/authors", s.ShowAuthorsHandler)
 		v1.GET("/authors/:id", s.GetAuthorHandler)
-		v1.POST("/authors", s.CreateAuthorsHandler)
+		v1.POST("/authors", s.CreateAuthorHandler)
 	}
 
 	return router

@@ -1,18 +1,19 @@
-package author
+package query
 
 import (
 	"context"
 	"github.com/alexhiggins/go-api/internal/data"
+	"github.com/alexhiggins/go-api/internal/repository"
 )
 
 type FetchAuthorQuery struct {
-	persistence Repository
+	persistence repository.AuthorRepository
 }
 
 func (f *FetchAuthorQuery) Handle(ctx context.Context, id int64) (data.Author, error) {
 	return f.persistence.WhereId(ctx, id)
 }
 
-func NewFetchAuthorQuery(persistence Repository) FetchAuthorQuery {
+func NewFetchAuthorQuery(persistence repository.AuthorRepository) FetchAuthorQuery {
 	return FetchAuthorQuery{persistence: persistence}
 }

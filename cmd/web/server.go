@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/alexhiggins/go-api/internal/author"
+	"github.com/alexhiggins/go-api/internal/command"
+	"github.com/alexhiggins/go-api/internal/query"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 )
 
 type server struct {
+	config   config
 	queries  queries
 	commands commands
 	logger   *zap.Logger
@@ -16,12 +18,12 @@ type server struct {
 }
 
 type commands struct {
-	createAuthor author.CreateAuthorCommand
+	createAuthor command.CreateAuthorCommand
 }
 
 type queries struct {
-	fetchAuthor     author.FetchAuthorQuery
-	fetchAllAuthors author.FetchAllAuthorsQuery
+	fetchAuthor     query.FetchAuthorQuery
+	fetchAllAuthors query.FetchAllAuthorsQuery
 }
 
 func (s *server) run(port string) error {
@@ -35,22 +37,22 @@ func (s *server) run(port string) error {
 	return nil
 }
 
-func (s *server) okResponse(c *gin.Context, body interface{}) {
+func (s *server) statusOk(c *gin.Context, body interface{}) {
 	c.JSON(http.StatusOK, body)
 }
 
-func (s *server) notFoundResponse(c *gin.Context, message string) {
+func (s *server) statusNotFound(c *gin.Context, message string) {
 	c.JSON(http.StatusNotFound, gin.H{"error": message})
 }
 
-func (s *server) createdResponse(c *gin.Context, body interface{}) {
+func (s *server) statusCreated(c *gin.Context, body interface{}) {
 	c.JSON(http.StatusCreated, body)
 }
 
-func (s *server) failedValidationResponse(c *gin.Context, v url.Values) {
-	c.JSON(http.StatusOK, gin.H{"error": v})
+func (s *server) statusUnprocessable(c *gin.Context, v url.Values) {
+	c.JSON(http.StatusUnprocessableEntity, v)
 }
 
-func (s *server) unknownError(c *gin.Context, message string) {
+func (s *server) statusBadRequestError(c *gin.Context, message string) {
 	c.JSON(http.StatusBadRequest, gin.H{"error": message})
 }
