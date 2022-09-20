@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"sync"
+
 	"github.com/alexhiggins/go-api/internal/data"
 )
 
@@ -30,6 +32,7 @@ func (d *AuthorDbRepository) Create(ctx context.Context, params data.CreateAutho
 }
 
 type AuthorInMemoryRepository struct {
+	lock    *sync.RWMutex
 	authors []data.Author
 }
 
@@ -38,6 +41,9 @@ func (d *AuthorInMemoryRepository) All(ctx context.Context) ([]data.Author, erro
 }
 
 func (d *AuthorInMemoryRepository) WhereId(ctx context.Context, id int64) (data.Author, error) {
+	d.lock.RLock()
+	defer d.lock.RUnlock()
+
 	for _, a := range d.authors {
 		if a.ID == id {
 			return a, nil
@@ -48,6 +54,9 @@ func (d *AuthorInMemoryRepository) WhereId(ctx context.Context, id int64) (data.
 }
 
 func (d *AuthorInMemoryRepository) Create(ctx context.Context, params data.CreateAuthorParams) (data.Author, error) {
+	d.lock.RLock()
+	defer d.lock.RUnlock()
+
 	author := data.Author{
 		ID:   int64(len(d.authors) + 1),
 		Name: params.Name,
@@ -64,5 +73,8 @@ func NewDbAuthorRepository(db *sql.DB) *AuthorDbRepository {
 }
 
 func NewInMemoryAuthorRepository() *AuthorInMemoryRepository {
-	return &AuthorInMemoryRepository{}
+	return &AuthorInMemoryRepository{
+		authors: []data.Author{},
+		lock:    &sync.RWMutex{},
+	}
 }
