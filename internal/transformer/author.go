@@ -1,4 +1,4 @@
-package presenter
+package transformer
 
 import "github.com/alexhiggins/go-api/internal/data"
 
@@ -27,7 +27,10 @@ func ShowAuthor(author data.Author) ShowAuthorResponse {
 }
 
 func ShowAllAuthors(authors []data.Author) ShowAllAuthorsResponse {
-	r := ShowAllAuthorsResponse{Data: []Author{}}
+	r := ShowAllAuthorsResponse{
+		Data: []Author{},
+	}
+
 	for _, a := range authors {
 		r.Data = append(r.Data, Author{
 			Id:   a.ID,

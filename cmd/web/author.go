@@ -2,12 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"strconv"
+
 	"github.com/alexhiggins/go-api/internal/data"
-	"github.com/alexhiggins/go-api/internal/presenter"
+	"github.com/alexhiggins/go-api/internal/transformer"
 	"github.com/alexhiggins/go-api/internal/validate"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 func (s *server) ShowAuthorsHandler(c *gin.Context) {
@@ -19,7 +20,7 @@ func (s *server) ShowAuthorsHandler(c *gin.Context) {
 		return
 	}
 
-	s.statusOk(c, presenter.ShowAllAuthors(authors))
+	s.statusOk(c, transformer.ShowAllAuthors(authors))
 }
 
 func (s *server) GetAuthorHandler(c *gin.Context) {
@@ -31,7 +32,7 @@ func (s *server) GetAuthorHandler(c *gin.Context) {
 		return
 	}
 
-	s.statusOk(c, presenter.ShowAuthor(a))
+	s.statusOk(c, transformer.ShowAuthor(a))
 }
 
 func (s *server) CreateAuthorHandler(c *gin.Context) {
@@ -52,5 +53,5 @@ func (s *server) CreateAuthorHandler(c *gin.Context) {
 		return
 	}
 
-	s.statusCreated(c, presenter.ShowAuthor(newAuthor))
+	s.statusCreated(c, transformer.ShowAuthor(newAuthor))
 }
