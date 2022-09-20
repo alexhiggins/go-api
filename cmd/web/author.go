@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"github.com/alexhiggins/go-api/internal/data"
 	"github.com/alexhiggins/go-api/internal/presenter"
-	"github.com/alexhiggins/go-api/internal/validation"
+	"github.com/alexhiggins/go-api/internal/validate"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"strconv"
@@ -35,7 +35,7 @@ func (s *server) GetAuthorHandler(c *gin.Context) {
 }
 
 func (s *server) CreateAuthorHandler(c *gin.Context) {
-	v, a := validation.NewAuthor(c.Request)
+	v, a := validate.NewAuthor(c.Request)
 	if len(v) > 0 {
 		s.statusUnprocessable(c, v)
 		return
