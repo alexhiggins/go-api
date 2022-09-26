@@ -69,7 +69,9 @@ func (d *AuthorInMemoryRepository) Create(ctx context.Context, params data.Creat
 }
 
 func NewDbAuthorRepository(db *sql.DB) *AuthorDbRepository {
-	return &AuthorDbRepository{query: data.New(db)}
+	return &AuthorDbRepository{
+		query: data.New(db),
+	}
 }
 
 func NewInMemoryAuthorRepository() *AuthorInMemoryRepository {

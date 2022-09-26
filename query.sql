@@ -10,3 +10,7 @@ ORDER BY id;
 INSERT INTO authors (name, bio)
 VALUES ($1, $2)
 RETURNING *;
+
+-- name: DeleteAuthor :exec
+DELETE FROM authors
+WHERE id = $1;

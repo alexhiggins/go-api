@@ -1,0 +1,145 @@
+definitions:
+  transformer.Author:
+    properties:
+      bio:
+        example: john doe's biography description'
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: john doe
+        type: string
+    type: object
+  transformer.Error:
+    properties:
+      error:
+        example: unable to find author
+        type: string
+    type: object
+  transformer.ItemResponse:
+    properties:
+      data: {}
+    type: object
+  transformer.ListResponse:
+    properties:
+      data:
+        items: {}
+        type: array
+    type: object
+  transformer.ShowHealthResponse:
+    properties:
+      status:
+        example: OK
+        type: string
+    type: object
+  validate.ValidatedAuthor:
+    properties:
+      bio:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/authors:
+    get:
+      consumes:
+      - '*/*'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/transformer.ListResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/transformer.Author'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transformer.Error'
+      summary: Show all authors
+      tags:
+      - author
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create Author
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/validate.ValidatedAuthor'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/transformer.ItemResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/transformer.Author'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transformer.Error'
+      summary: Create an author
+      tags:
+      - author
+  /api/v1/authors/{id}:
+    get:
+      consumes:
+      - '*/*'
+      parameters:
+      - description: Author ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/transformer.ItemResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/transformer.Author'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/transformer.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/transformer.Error'
+      summary: Show an individual author
+      tags:
+      - author
+  /health:
+    get:
+      consumes:
+      - '*/*'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transformer.ShowHealthResponse'
+      summary: Show the status of server.
+swagger: "2.0"
